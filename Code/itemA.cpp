@@ -1,6 +1,6 @@
 
 #include <iostream>
-#include <cmath> //Permitido??
+#include <cmath>
 using namespace std;
 
 double u0(double x);
@@ -26,7 +26,7 @@ int main()
 
 	// ------------------------------------------
 	// Tratamento de dados
-	double u[N+1][M+1];
+	double u[N+1][M+1]; //Ma pratica, mas funciona
 
     // Limpa matriz a ser utilizada
 	for(int i=0; i!=N+1; i++){
@@ -110,5 +110,5 @@ double g2(double t){
 }
 
 double u_esperado(double x, double t){
-	return (1.0 + sin( 10.0*t))*x*x*(1.0-x)*(1.0*x);
+	return (1.0 + sin( 10.0*t))*x*x*(1.0-x)*(1.0-x);
 }
