@@ -36,13 +36,13 @@ int main()
 	lambda = dt/(dx*dx);
 	cout << "O lambda para as condicoes escolhidas e' : " << lambda << endl;
 
-
+//Ao inves de matrizes usar algumas variaveis que vao sendo atualizadas...
 	// ------------------------------------------
 	// Tratamento de dados
 	double u[N+1][M+1]; //Matriz de temperatura
 	double e[N+1][M+1]; // Matriz de erro
-    double trunc[N+1][M+1]; //Matriz de erro local de truncamento
-    double norma_e[M];// Vetor de normas do erro ao longo do tempo
+    double truncIK = 0.0; //Erro local de truncamento, sera atualizado ao longo da execucao
+    double norma_e = 0.0; //Norma do erro ao longo do tempo
 
 
     // Limpa matrizes a serem utilizadas
@@ -50,7 +50,6 @@ int main()
         for(int k=0; k!=M+1; k++){
         u[i][k]=0.0;
         e[i][k]=0.0;
-        trunc[i][k]=0.0;
         }
     }
 
@@ -74,26 +73,20 @@ int main()
 			u[i][k+1] = u[i][k] + dt*(  (u[i-1][k] - (2.0*(u[i][k])) + u[i+1][k])/(dx*dx) + f(dx*i, dt*k)  );
 
                 //Equacao 12 //Os valores de u foram calculados em lacos anteriores ou imediatamente antes
-            trunc[i][k] = (u[i][k+1] - u[i][k])/dt  - (u[i-1][k] - 2*u[i][k] + u[i+1][k])/(dx*dx)   -  f(i*dx, k*dt);
+            truncIK = (u[i][k+1] - u[i][k])/dt  - (u[i-1][k] - 2*u[i][k] + u[i+1][k])/(dx*dx)   -  f(i*dx, k*dt);
+
+                //Equacao 15
+            tal=maximo(tal, truncIK);
 
                 //Equacao 18
-            e[i][k+1] = e[i][k] + dt*(  (e[i-1][k] - (2.0*(e[i][k])) + e[i+1][k])/(dx*dx) + trunc[i][k]  );
+            e[i][k+1] = e[i][k] + dt*(  (e[i-1][k] - (2.0*(e[i][k])) + e[i+1][k])/(dx*dx) + truncIK  );
+
+             //Equacao 19
+            norma_e = maximo(norma_e, e[i][k+1]);//Vai de 1 a M em busca do maior valor de erro
+
 		}
 	}
 
-
-    // Calculo de normas dos erros
-
-    for (int k=0; k!=M; k++){//O erro de truncamento nao foi calculado em T, pois nao e' usado em "e" e precisaria de u em T+dt
-        for (int i=0; i!=N; i++){
-            // Equacao 15
-            tal=maximo(tal, trunc[i][k]);
-
-            //Equacao 19
-            norma_e[k+1]=maximo(norma_e[k+1], e[i][k+1]);//Vai de 1 a M em busca do maior valor de erro
-
-        }
-    }
 
 
 
@@ -104,7 +97,7 @@ int main()
 	//cout  << "f(dx*8, dt*300) : " << f(dx*8, dt*300) << endl;
 
 
-    cout<<endl<<"A norma do erro para T e': "<< norma_e[M]<<endl;
+    cout<<endl<<"A norma do erro para T e': "<< norma_e <<endl;
 
 
 	//interativas
