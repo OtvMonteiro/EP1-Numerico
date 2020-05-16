@@ -8,7 +8,7 @@ int main()
 {
 	// Declaracao de variaveis fixas
 	int N = 10;
-	int M ;
+	double M ;
 	double dx, lambda;
 	double T = 1;
 	
@@ -23,6 +23,7 @@ int main()
 		
 	dx=(1.0)/N;
 	M = T/(dx*dx*lambda);	
-	cout << "O M a ser escolhido e': " << M;
+	int out = (int) (M+0.5);
+	cout << "O M a ser escolhido e': " << out;
 	return 0;
 }

@@ -13,18 +13,28 @@ double maximo(double a, double b);
 
 int main()
 {
-	// Declaracao de variaveis fixas
+	// Declaracao de variaveis
 	int N ;
 	int M ;
 	double dt, dx, lambda;
 	double T = 1.0;
 	double tal;
 
-		// Interface do usuario com entradas de dados
+
+    // Interface do usuario e entradas de dados
 	cout << "Digite o valor desejado para 'N'" << endl;
 	cin  >> N;
 	cout << "Digite o valor desejado para 'M'" << endl;
 	cin  >> M;
+
+	  //Definicoes de dt e dx
+	dt=T/M;
+	dx=(1.0)/N;
+
+		// Imprime para o usuario dx, dt e lambda
+	cout << "dx = " << dx << endl << "dt = " << dt << endl ;
+	lambda = dt/(dx*dx);
+	cout << "O lambda para as condicoes escolhidas e' : " << lambda << endl;
 
 
 	// ------------------------------------------
@@ -32,7 +42,7 @@ int main()
 	double u[N+1][M+1]; //Matriz de temperatura
 	double e[N+1][M+1]; // Matriz de erro
     double trunc[N+1][M+1]; //Matriz de erro local de truncamento
-    double norma_e[M];
+    double norma_e[M];// Vetor de normas do erro ao longo do tempo
 
 
     // Limpa matrizes a serem utilizadas
@@ -44,19 +54,10 @@ int main()
         }
     }
 
-	  //Definicoes de dt e dx
-	dt=T/M;
-	dx=(1.0)/N;
-
-		// Imprime para o usuario dx, dt e lambda
-	cout << "dx = " << dx << endl << "dt = " << dt << endl ;
-	lambda = dt/(dx*dx);
-	cout << "O lambda para as condicoes escolhidas e' : " << lambda << endl;
-
-		//Condicao inicial
-		for (int i=0; i!=N+1 ; i++){
-			u[i][0] = u0(i*dx);
-		}
+    //Condicao inicial
+    for (int i=0; i!=N+1 ; i++){
+        u[i][0] = u0(i*dx);
+    }
 
 
 	// ---- Execucao
@@ -106,7 +107,7 @@ int main()
     cout<<endl<<"A norma do erro para T e': "<< norma_e[M]<<endl;
 
 
-	//interativa:s
+	//interativas
 
        // Imprimir valores em comparacao (para t=k*dt) ao longo de x
     cout<<endl<< "Deseja imprimir valores em T ao longo de x para comparacao?[S/n]:"<<endl;
@@ -167,8 +168,12 @@ double u_esperado(double x, double t){
 	return (1.0 + sin( 10.0*t))*x*x*(1.0-x)*(1.0-x);
 }
 
+
+//Calcula o maximo entre o absoluto de dois valores
 double maximo(double a, double b){
     double eps=0.00000001;
-    if(a-b<eps){return b;}
-    else{return a;}
+    double c = abs(a);
+    double d = abs(b);
+    if(c-d<eps){return d;}
+    else{return c;}
 }
