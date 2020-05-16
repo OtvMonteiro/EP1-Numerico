@@ -4,10 +4,12 @@
 using namespace std;
 
 double u0(double x);
-double funcaoA(double x,double t);
+double f(double x,double t);
 double g1(double t);
 double g2(double t);
 double u_esperado(double x, double t);
+double maximo(double a, double b);
+
 
 int main()
 {
@@ -16,6 +18,7 @@ int main()
 	int M ;
 	double dt, dx, lambda;
 	double T = 1.0;
+	double tal;
 
 		// Interface do usuario com entradas de dados
 	cout << "Digite o valor desejado para 'N'" << endl;
@@ -26,12 +29,18 @@ int main()
 
 	// ------------------------------------------
 	// Tratamento de dados
-	double u[N+1][M+1]; //Ma pratica, mas funciona
+	double u[N+1][M+1]; //Matriz de temperatura
+	double e[N+1][M+1]; // Matriz de erro
+    double trunc[N+1][M+1]; //Matriz de erro local de truncamento
+    double norma_e[M];
 
-    // Limpa matriz a ser utilizada
+
+    // Limpa matrizes a serem utilizadas
 	for(int i=0; i!=N+1; i++){
         for(int k=0; k!=M+1; k++){
         u[i][k]=0.0;
+        e[i][k]=0.0;
+        trunc[i][k]=0.0;
         }
     }
 
@@ -61,32 +70,77 @@ int main()
 		// Calculo ao longo de x
 		for (int i=1; i!=N; i++){
 				//Equacao 11
-			u[i][k+1] =( u[i][k] + dt*( (( u[i-1][k] - (2.0*(u[i][k])) + u[i+1][k] )/(dx*dx))  +  funcaoA(dx*i, dt*k) )   );
+			u[i][k+1] = u[i][k] + dt*(  (u[i-1][k] - (2.0*(u[i][k])) + u[i+1][k])/(dx*dx) + f(dx*i, dt*k)  );
 
+                //Equacao 12 //Os valores de u foram calculados em lacos anteriores ou imediatamente antes
+            trunc[i][k] = (u[i][k+1] - u[i][k])/dt  - (u[i-1][k] - 2*u[i][k] + u[i+1][k])/(dx*dx)   -  f(i*dx, k*dt);
+
+                //Equacao 18
+            e[i][k+1] = e[i][k] + dt*(  (e[i-1][k] - (2.0*(e[i][k])) + e[i+1][k])/(dx*dx) + trunc[i][k]  );
 		}
 	}
 
 
+    // Calculo de normas dos erros
+
+    for (int k=0; k!=M; k++){//O erro de truncamento nao foi calculado em T, pois nao e' usado em "e" e precisaria de u em T+dt
+        for (int i=0; i!=N; i++){
+            // Equacao 15
+            tal=maximo(tal, trunc[i][k]);
+
+            //Equacao 19
+            norma_e[k+1]=maximo(norma_e[k+1], e[i][k+1]);//Vai de 1 a M em busca do maior valor de erro
+
+        }
+    }
+
+
+
+  //SAIDAS
+
 
 	//teste
-	cout  << "funcaoA(dx*8, dt*300) : " << funcaoA(dx*8, dt*300) << endl;
-
-	// Imprimir valores em comparacao (para t=k*dt) ao longo de x
-	for (int i=0; i!=N+1; i++){
-		cout << "Encontrado:" << u[i][M] << "   Esperado:"<< u_esperado(i*dx, M*dt) << endl;
-	}
+	//cout  << "f(dx*8, dt*300) : " << f(dx*8, dt*300) << endl;
 
 
-	// Escolher um output para ser mostrado em comparacao com o esperado
-	int i_out, k_out;
+    cout<<endl<<"A norma do erro para T e': "<< norma_e[M]<<endl;
 
-	cout << "Escolha um valor de 0 a N para mostrar:"<<endl;
-	cin  >> i_out;
-	cout << "Escolha um valor de 0 a M para mostrar:"<<endl;
-	cin  >> k_out;
-	cout << "Os resultados para u(x=" << i_out*dx <<" , t="<< k_out*dt<<"):"<<endl;
-	cout << "Encontrado:" << u[i_out][k_out] << "   Esperado:"<< u_esperado(i_out*dx, k_out*dt) << endl;
-	return 0;
+
+	//interativa:s
+
+       // Imprimir valores em comparacao (para t=k*dt) ao longo de x
+    cout<<endl<< "Deseja imprimir valores em T ao longo de x para comparacao?[S/n]:"<<endl;
+    char gui_choice1 = 'n';
+    cin  >> gui_choice1;
+
+    if(gui_choice1!='n'){
+        for (int i=0; i!=N+1; i++){
+            cout << "Encontrado:" << u[i][M] << "   Esperado:"<< u_esperado(i*dx, M*dt) << endl;
+        }
+    }
+
+
+       // Escolher um output para ser mostrado em comparacao com o esperado
+
+    cout<<endl<< "Deseja escolher valores de N e M para avaliar os valores encontrado e esperado?[S/n]:"<<endl;
+    char gui_choice2 = 'n';
+    cin  >> gui_choice2;
+
+    if(gui_choice2!='n'){
+
+        int i_out, k_out;
+
+        cout << "Escolha um valor de 0 a N para mostrar:"<<endl;
+        cin  >> i_out;
+        cout << "Escolha um valor de 0 a M para mostrar:"<<endl;
+        cin  >> k_out;
+        cout << "Os resultados para u(x=" << i_out*dx <<" , t="<< k_out*dt<<"):"<<endl;
+        cout << "Encontrado:" << u[i_out][k_out] << "   Esperado:"<< u_esperado(i_out*dx, k_out*dt) << endl;
+        return 0;
+    }
+
+
+
 }
 
 
@@ -96,7 +150,7 @@ double u0(double x){
 	return x*x*(1.0-x);
 }
 
-double funcaoA(double x,double t){
+double f(double x,double t){
     //return 10*(x*x)*(x-1) - 60*x*t + 20*t ;// Primeira funcao
 	return (10.0*cos(10.0*t)*x*x*(1.0-x)*(1.0-x)) - ((1.0 + sin(10.0*t))*((12.0*x*x)-(12.0*x)+2.0));
 }
@@ -111,4 +165,10 @@ double g2(double t){
 
 double u_esperado(double x, double t){
 	return (1.0 + sin( 10.0*t))*x*x*(1.0-x)*(1.0-x);
+}
+
+double maximo(double a, double b){
+    double eps=0.00000001;
+    if(a-b<eps){return b;}
+    else{return a;}
 }
