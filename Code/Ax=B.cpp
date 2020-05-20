@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 	double As[ ] = { 0, 0, 2, 4, 6};
 	double b[ ]  = { 0, 0, 9, 12, 19};
 	//x para esses valores: 2,-1,2,1 
-	double x[N-1];
+	double x[N-1];		
 	
 	
 	
