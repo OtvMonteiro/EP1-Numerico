@@ -43,7 +43,7 @@ int main()
 	
 	double e_atual[N]; //Vetor de erro ao longo do eixo x no tempo k
 	double e_proximo[N];//Vetor de erro ao longo do eixo x no tempo k+1
-    double norma_e = 0.0; //Norma do erro em t=T-dt
+	double norma_e = 0.0; //Norma do erro em t=T-dt
 	double norma_ekp = 0.0; //Norma do erro em t=T
 
     double truncIK = 0.0; //Erro local de truncamento, sera atualizado ao longo da execucao
@@ -71,11 +71,11 @@ int main()
 	for(int k=0; k!=M ; k++){	
 		
 		//Atualizando valores nas fronteiras	
-		b[1]=u[1] + dt*f(dx, dt*(k+1)) + lambda*g1(dt*(k+1));
-		b[N-1]=u[N-1] + dt*f(dx*(N-1), dt*(k+1)) + lambda*g2(dt*(k+1));
+		b[1]=u[1] + (lambda*(u[0]-2*u[1]+u[2])/2) + (dt*(f(dx*1,dt*k)+f(dx*1,dt*(k+1)))/2) + (lambda*g1(dt*(k+1))/2);
+		b[N-1]=u[N-1] + (lambda*(u[N-2]-2*u[N-1])/2) + (dt*(f(dx*(N-1),dt*k)+f(dx*(N-1),dt*(k+1)))/2) + (lambda*g2(dt*(k+1))/2);
 		//Atualizando os valores de b para esse loop
 		for (int i=2; i!=N-1; i++){
-			b[i]=u[i]+dt*f(dx*i, dt*(k+1));//Equacao 29
+			b[i]=u[i] + (lambda*(u[i-1]-2*u[i]+u[i+1])/2) + (dt*(f(dx*i,dt*k)+f(dx*i,dt*(k+1)))/2);
 		}
 		
 		//Limpando matrizes L e D
@@ -84,12 +84,12 @@ int main()
 			L[i]=0.0;
 		}
 		
-		//Setando valores de A
+		//Setando valores de A para Crank-Nicolson (metade do lambda utilizado no Metodo de Newton)
 		for (int i=1; i!=N ; i++){
-			Ad[i]=1+2*lambda;//diagonal principal
+			Ad[i]=1+lambda;//diagonal principal
 		}
 		for (int i=2; i!=N ; i++){
-			As[i]=-lambda;//diagonais secundarias
+			As[i]=-lambda/2;//diagonais secundarias
 		}	
 		//Decompondo matriz A 
 		for(int i=1;i!=N;i++){
@@ -141,7 +141,6 @@ int main()
 			}
 		}
 	}		
-	
 
 	double normaET=0.0;
 	for (int i=1; i!=N; i++){
@@ -157,15 +156,15 @@ int main()
     }
 
 
-  //SAIDAS
+
+   //SAIDAS
 	cout<<endl<<endl;
 	cout<<N<<" & "<<M<<" & "<<lambda<<" & "<<normaET<<" & "<<tal<<" & "<<norma_ekp<<" & "<<norma_e  + dt*tal<<"  \\\\ \\hline"<<endl<<endl;//saida para tabela latex
 	cout<<"A norma do erro entre a solucao aproximada e a exata, em tk=T, e': " << normaET <<endl;
     cout<<"O erro de truncamento delimitado, T(dt,dx) e': "<< tal <<endl;
     cout<<"A norma do erro para T encontrada e': "<< norma_ekp <<endl;
 	cout<<"A norma do erro para T esperada e': |e(i,k+1)|<="<<norma_e  + dt*tal << endl;//Equacao 22
-	
-	
+
 	
 	
 	
@@ -179,8 +178,8 @@ int main()
 
     if(gui_choice1!='n'){
         for (int i=0; i!=N+1; i++){
-			cout<<u[i]<<" & "<<u_esperado(i*dx, M*dt)<<" & "<<abs(u[i]- u_esperado(i*dx, M*dt)) <<"  \\\\ \\hline"<<endl;//Saida para tabela em latex
-			//cout << "Encontrado:" << u[i] << "   Esperado:"<< u_esperado(i*dx, M*dt) << endl;
+           // cout<<u[i]<<" & "<<u_esperado(i*dx, M*dt)<<" & "<<abs(u[i]- u_esperado(i*dx, M*dt)) <<"  \\\\ \\hline"<<endl;//Saida para tabela em latex
+            cout << "Encontrado:" << u[i] << "   Esperado:"<< u_esperado(i*dx, M*dt) << endl;
         }
     }
 

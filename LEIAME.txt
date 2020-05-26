@@ -4,3 +4,10 @@
 %Otavio Henrique Monteiro nUSP 10774159 %
 %                                       %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Instrucoes de compilacao:
+
+Cada codigo e' standalone
+Compilador GNU/Gcc padrao.
+IDEs como CodeBlocks e Geany compilam por padrao.
+Desativar flag do Codeblocks que indica erros para codigos fora da ISO.

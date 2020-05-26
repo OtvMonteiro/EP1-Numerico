@@ -46,8 +46,8 @@ int main()
 	double e_proximo[N];//Vetor de erro ao longo do eixo x no tempo k+1
 
     double truncIK = 0.0; //Erro local de truncamento, sera atualizado ao longo da execucao
-    double norma_e = 0.0; //Norma do erro ao longo do tempo
-
+    double norma_e = 0.0; //Norma do erro em t=T-dt
+	double norma_ekp = 0.0; //Norma do erro em t=T
 
 
     //Condicao inVetor de erro ao longo do eixo x no icial
@@ -86,7 +86,9 @@ int main()
             //Atualiza vetores no tempo apos calcular valores para todas as posicoes
         for(int i=1; i!=N ; i++){
             u_atual[i]=u_proximo[i];
-            e_atual[i]=e_proximo[i];
+            if(k<M-1){//atualiza todos menos o ultimo (usaremos e(k) e e(k+1))
+				e_atual[i]=e_proximo[i];
+			}
         }
 
 	}
@@ -96,20 +98,26 @@ int main()
 
 	
 	
-	//Calculo da norma do erro entre a solucao aproximada e a exata, em tk=T
 	double normaET=0.0;
 	for (int i=0; i!=N+1; i++){
+    //Calculo da norma do erro entre a solucao aproximada e a exata, em tk=T
      normaET = maximo(normaET, (u_esperado(i*dx, M*dt) - u_proximo[i]) );
+     
+     //Equacao 19
+     norma_e = maximo(norma_e, e_atual[i]);//Vai em busca do maior valor de erro para t=T-dt
+	
+	 //Calculo de da norma de e em t=T
+     norma_ekp = maximo(norma_e, e_proximo[i]);//Vai em busca do maior valor de erro para t=T
+	
+    
     }
 
 
   //SAIDAS
 	cout<<endl<<endl;
 	cout<<"A norma do erro entre a solucao aproximada e a exata, em tk=T, e': " << normaET <<endl;
-    cout<<"A norma do erro de(equacao 18 e 19) para T e': "<< norma_e <<endl;
-	cout<<"|e(i,k+1)|<="<<((1-2*lambda)+2*lambda)*norma_e  + dt*tal << endl;//Equacao 22
-	//Calculando o erro de acordo com as equacoes 17 e 19, para tk=T
-	
+    cout<<"A norma do erro para T encontrada e': "<< norma_ekp <<endl;
+	cout<<"A norma do erro para T esperada e': |e(i,k+1)|<="<<((1-2*lambda)+2*lambda)*norma_e  + dt*tal << endl;//Equacao 22
 	
 	
 	
