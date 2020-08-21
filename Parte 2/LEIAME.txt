@@ -1,0 +1,19 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EP2 MAP 3121                          %
+%                                       %
+%Otavio Henrique Monteiro nUSP 10774159 %
+%                                       %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+O arquivo contendo o código é único e pode ser compilado em qualquer IDE de C++. A interface é pelo terminal para todos os itens.
+Inicialmente deve-se selecionar qual dos itens se deseja executar, digitando a, b, c ou d (minusculo, sem adicionais). Os valores de intesidade, nf e N para os itens a e b estão armazenados dentro do programa e podem ser alterados. Os valores de c e d são lidos do arquivo "teste.txt", sendo setado internamente o valor de nf (10 para ambos).
+Para os itens c e d deve-se então selecionar o valor de N e o programa ira executar os calculos.
+Para todos os itens a saída sera inicialmente a matriz de mmq e os valores de bmmq, relacionados da seguinte forma: Ammq.(Intensidades)=bmmq
+Depois disso é impressa a coluna de intensidades encontradas e o erro calculado. Para o item d existe o erro calculado com os valores originais de uT e o erro para os valores modificados com ruído.
+
+Ademais, ao final dos itens c e d é perguntado ao usuário se deseja imprimir os valores encontrados, no terminal e em um arquivo denominado "saida.txt".
+
+Estrutura do código:
+O codigo começa com as entradas de usuario, fazem então a conta para o método de Cranck-Nicolson para as fontes nos pontos pré-estabelecidos ou fornecidos por teste.txt.
+Com esse metodo, resolvemos o sistema linear para os valores de nf. Montamos entao o sistema de MMQ e o resolvemos pelo novo metodo de decomposiçao de Choleski, tendo como saída as intensidades.
